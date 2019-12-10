@@ -6,7 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "Critter.generated.h"
 
-class UStaticMeshComponent;
+class USkeletalMeshComponent;
 class UCameraComponent;
 
 UCLASS()
@@ -21,7 +21,7 @@ public:
 public:
 
 	UPROPERTY(EditAnywhere, Category = "Mesh")
-		UStaticMeshComponent* Mesh;
+		USkeletalMeshComponent* Mesh;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 		UCameraComponent* Camera;

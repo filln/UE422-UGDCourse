@@ -66,4 +66,10 @@ private:
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+
+	void CameraPitch(float AxisValue);
+	void CameraYaw(float AxisValue);
+
+	/*Для сохранения временного положения камеры.*/
+	FVector2D CameraInput;
 };
