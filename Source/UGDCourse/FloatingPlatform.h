@@ -32,6 +32,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FloatingPlatform")
 		float InterpSpeed;
 
+private:
+
+	FTimerHandle InterpTimer;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
