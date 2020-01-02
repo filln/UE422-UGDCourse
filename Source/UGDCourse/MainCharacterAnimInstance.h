@@ -7,6 +7,7 @@
 #include "MainCharacterAnimInstance.generated.h"
 
 class APawn;
+class AMainCharacter;
 
 /**
  *
@@ -24,6 +25,8 @@ public:
 		bool bIsInAir;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 		APawn* Pawn;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+		AMainCharacter* MainCharacter;
 
 public:
 

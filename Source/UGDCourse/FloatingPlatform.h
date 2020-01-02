@@ -26,15 +26,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = "FloatingPlatform")
 		FVector StartPoint;
 
-	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = "true"))
+	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = "true"), Category = "FloatingPlatform")
 		FVector EndPoint;
 
+	/*Speed of platform.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FloatingPlatform")
 		float InterpSpeed;
+	/*Pause between movings.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FloatingPlatform")
+		float InterpTime;
 
 private:
 
 	FTimerHandle InterpTimer;
+	bool bInterping;
+	float Distance;
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,5 +49,8 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void ToggleInterping();
+	void SwapVectors(FVector& VecOne, FVector& VecTwo);
 
 };
