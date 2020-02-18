@@ -1,5 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+/*General character. It can move and attack. */
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,6 +10,13 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class AWeapon;
+class AItem;
+class UAnimMontage;
+class USoundCue;
+class UParticleSystem;
+class AEnemy;
+class AMainPlayerController;
 
 /*Status of character movement.*/
 UENUM(BlueprintType)
@@ -23,8 +32,8 @@ enum class EStaminaStatus : uint8
 {
 	ESS_Normal					UMETA(DisplayName = "Normal"),				//Normal level, allow sprinting.
 	ESS_BelowMinimum			UMETA(DisplayName = "BelowMinimum"),		//Minimum level, allow sprinting.
-	ESS_Exhausted				UMETA(DisplayName = "Exhausted"),			//Zero level, does not allow.
-	ESS_ExhaustedRecovering		UMETA(DisplayName = "ExhaustedRecovering"), //From zero to minimum level, does not allow.
+	ESS_Exhausted				UMETA(DisplayName = "Exhausted"),			//Zero level, does not allow sprinting.
+	ESS_ExhaustedRecovering		UMETA(DisplayName = "ExhaustedRecovering"), //From zero to minimum level, does not allow sprinting.
 };
 
 UCLASS()
@@ -50,18 +59,23 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		float BaseLookUpRate;
 
+	/*Maximum of Health.*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player stats")
 		float MaxHealth;
 
+	/*Current Health.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player stats")
 		float Health;
 
+	/*Maximum of Stamina.*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player stats")
 		float MaxStamina;
 
+	/*Current Stamina.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player stats")
 		float Stamina;
 
+	/*Current count of coins.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player stats")
 		int32 Coins;
 
@@ -73,12 +87,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enums")
 		EStaminaStatus StaminaStatus;
 
+	/*Standart speed of moving.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 		float RunningSpeed;
 
+	/*Increased speed of moving.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 		float SprintingSpeed;
 
+	/*The rate of stamina reduction in a sprint. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player stats")
 		float StaminaDrainRate;
 
@@ -86,13 +103,77 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player stats")
 		float MinSprintStamina;
 
+	/*Weapon what the character has.*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+		AWeapon* EquippedWeapon;
+
+	/*Current item that overlapping now.*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+		AItem* ActiveOverlappingItem;
+
+	/*True if now playing animation of attack.*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Anims")
+		bool bAttacking;
+
+	/*Animation Montage for combat.*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+		UAnimMontage* CombatMontage;
+
+	/*Particles that show in attack.*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+		UParticleSystem* HitParticles;
+
+	/*Sound that play in attack.*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+		USoundCue* HitSound;
+
+	/*Reference to current enemy.*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+		AEnemy* CombatTarget;
+
+	/*True if CombatTarget is valid. Use in Enemy.cpp and Enemy Health Bar Widget. Set by SetHasCombatTarget().*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+		bool bHasCombatTarget;
+
+	/*Use for set some variables in MainPlayerController.*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Controller")
+		AMainPlayerController* MainPlayerController;
+
+	/*Location of current Enemy.*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+		FVector CombatTargetLocation;
 
 public:
 
+	/*True if Shift pressed. Use for management of stamina.*/
 	bool bShiftKeyDown;
 
+	/*True if Left Mouse Button pressed. Use for a repeat attack.*/
+	bool bLMBDown;
+
+	/*Speed of rotate to enemy after attack him.*/
+	float InterpSpeed;
+
+	/*If true than rotate to enemy after attack him.*/
+	bool bInterpToEnemy;
+
+	/*Set bInterpToEnemy.*/
+	void SetInterpToEnemy(bool NewbInterpToEnemy);
+
+
 public:
 
+	/*Work after end of attack animation. Use for some events after attack.*/
+	UFUNCTION(BlueprintCallable, Category = "Anims")
+		void AttackEnd();
+
+	/*Play sound of attack.*/
+	UFUNCTION(BlueprintCallable, Category = "Sound")
+		void PlaySwingSound();
+
+	/*Work after end of death animation. Use for some events after death.*/
+	UFUNCTION(BlueprintCallable)
+		void DeathEnd();
 
 protected:
 	// Called when the game starts or when spawned
@@ -101,6 +182,9 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	/*Work in Tick(). Use for management sprint mode.*/
+	void StaminaManagement(float DeltaTime);
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -121,17 +205,22 @@ public:
 	*/
 	void LookUpAtRate(float Rate);
 
-	FORCEINLINE USpringArmComponent* GetCameraBoom() { return CameraBoom; }
-	FORCEINLINE UCameraComponent* GetFollowCamera() { return FollowCamera; }
 
 	/*Set movement status and running speed.*/
 	void SetMovementStatus(EMovementStatus NewStatus);
 
-	/*Set new status of stamina.*/
-	FORCEINLINE void SetStaminaStatus(EStaminaStatus NewStaminaStatus) { StaminaStatus = NewStaminaStatus; }
 
 	/*Decrease Health when take damage.*/
 	void DecrementHealth(float Amount);
+
+	/*Decrement health after take damage.*/
+	virtual float TakeDamage
+	(
+		float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator,
+		AActor* DamageCauser
+	) override;
 
 	/*Die when Health == 0.*/
 	void Die();
@@ -144,5 +233,42 @@ public:
 
 	/*Released up to disable sprinting.*/
 	void ShiftKeyUp();
+
+	/*Call when the Left Mouse Button was pressed.*/
+	void LMBDown();
+
+	/*Call when the Left Mouse Button was released.*/
+	void LMBUp();
+
+	/*Change weapon or first set it.*/
+	void SetEquippedWeapon(AWeapon* NewWeapon);
+
+	/*Play attack animation.*/
+	void Attack();
+
+	/*Return rotator to Target. Use for rotate to Enemy after attack him.*/
+	FRotator GetLookAtRotationYaw(FVector Target);
+
+	/*Set new reference to Enemy.*/
+	FORCEINLINE void SetCombatTarget(AEnemy* NewCombatTarget) { CombatTarget = NewCombatTarget; }
+	FORCEINLINE AEnemy* GetCombatTarget() { return CombatTarget; }
+
+	/*Set new status of stamina.*/
+	FORCEINLINE void SetStaminaStatus(EStaminaStatus NewStaminaStatus) { StaminaStatus = NewStaminaStatus; }
+
+	/*Return pointer to current weapon.*/
+	FORCEINLINE AWeapon* GetEquippedWeapon() { return EquippedWeapon; }
+
+	/*Set pointer to current overlapping item.*/
+	FORCEINLINE void SetActiveOverlappingItem(AItem* NewItem) { ActiveOverlappingItem = NewItem; }
+
+	/*Return SpringArm.*/
+	FORCEINLINE USpringArmComponent* GetCameraBoom() { return CameraBoom; }
+
+	/*Return Camera.*/
+	FORCEINLINE UCameraComponent* GetFollowCamera() { return FollowCamera; }
+
+	/*Set bHasCombatTarget. Use in Enemy.cpp and Enemy Health Bar Widget.*/
+	FORCEINLINE void SetHasCombatTarget(bool NewHasCombatTarget) { bHasCombatTarget = NewHasCombatTarget; }
 
 };

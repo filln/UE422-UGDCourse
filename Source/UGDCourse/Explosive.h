@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+/*Explosive item, that works after overlap MainCharacter.*/
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -20,6 +22,7 @@ public:
 
 public:
 
+	/*Damage to MainCharacter.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage")
 		float Damage;
 

@@ -27,9 +27,12 @@ void UMainCharacterAnimInstance::UpdateAnimationProperties()
 
 	if (Pawn)
 	{
+		/*Get scalar of speed from vector of velocity.*/
 		FVector Speed = Pawn->GetVelocity();
 		FVector LateralSpeed = FVector(Speed.X, Speed.Y, 0.f);
 		MovementSpeed = LateralSpeed.Size();
+
+		/*Get falling status.*/
 		bIsInAir = Pawn->GetMovementComponent()->IsFalling();
 
 		if (MainCharacter == nullptr)

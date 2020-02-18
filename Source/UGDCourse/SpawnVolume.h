@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+/*Place for spawn Critter in random point of this place.*/
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -34,6 +36,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "SpawnVolume")
 		FVector GetSpawnPoint();
 
+	/*Blueprint event for spawn our ToSpawn class.*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SpawnVolume")
 		void SpawnOurPawn(UClass* ToSpawn, const FTransform& TransformOfSpawn);
 

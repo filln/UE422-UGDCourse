@@ -10,7 +10,7 @@
 // Sets default values
 ASpawnVolume::ASpawnVolume()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpawningBox = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawningBox"));
@@ -20,9 +20,12 @@ ASpawnVolume::ASpawnVolume()
 
 FVector ASpawnVolume::GetSpawnPoint()
 {
+	/*Get size of spawn volume.*/
 	FVector Extent = SpawningBox->GetScaledBoxExtent();
+	/*Get location of spawn folume.*/
 	FVector Origin = SpawningBox->GetComponentLocation();
 
+	/*Generate the random point.*/
 	FVector Point = UKismetMathLibrary::RandomPointInBoundingBox(Origin, Extent);
 
 	return Point;
@@ -41,6 +44,7 @@ void ASpawnVolume::SpawnOurPawn_Implementation(UClass* ToSpawn, const FTransform
 		return;
 	}
 
+	/*Spawn Critter.*/
 	FActorSpawnParameters SpawnParams;
 	ACritter* CritterSpawned = World->SpawnActor<ACritter>(ToSpawn, TransformOfSpawn, SpawnParams);
 

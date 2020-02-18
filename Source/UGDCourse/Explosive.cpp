@@ -21,7 +21,11 @@ void AExplosive::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 
 		if (MainCharacter)
 		{
+			/*Damage to MainCharacter.*/
 			MainCharacter->DecrementHealth(Damage);
+
+			/*Destroy this item.*/
+			Destroy();
 		}
 	}
 }

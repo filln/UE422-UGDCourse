@@ -15,6 +15,7 @@ void APickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 	UE_LOG(LogTemp, Warning, TEXT("Pickup::OverlapBegin."));
 
+	/*Increment count of the coins in MainCharacter and destroy this coin.*/
 	if (OtherActor)
 	{
 		AMainCharacter* MainCharacter = Cast<AMainCharacter>(OtherActor);
@@ -22,6 +23,7 @@ void APickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 		if (MainCharacter)
 		{
 			MainCharacter->IncrementCoins(CoinCount);
+			Destroy();
 		}
 	}
 }

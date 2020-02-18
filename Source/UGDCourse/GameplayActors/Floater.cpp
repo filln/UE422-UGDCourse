@@ -34,11 +34,12 @@ void AFloater::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*Not use.*/
 	PlacedLocation = GetActorLocation();
 
 	if (bInitializeFloaterLocations)
 	{
-		/*Задать случайную локацию*/
+		/*Set a random position.*/
 		float InitialX = FMath::FRandRange(-500.f, 500.f);
 		float InitialY = FMath::FRandRange(-500.f, 500.f);
 		float InitialZ = FMath::FRandRange(0.f, 500.f);
@@ -65,6 +66,8 @@ void AFloater::Tick(float DeltaTime)
 
 	if (bShouldFloat)
 	{
+		/*Set the rotation for Floater.*/
+
 		FVector NewLocation = GetActorLocation();
 
 		NewLocation.X = NewLocation.X + Amplitude * FMath::Sin(TimeStretch * RunningTime);

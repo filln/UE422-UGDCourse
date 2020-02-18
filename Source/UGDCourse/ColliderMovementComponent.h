@@ -1,6 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 /*
-Компонент для движения павна.
+Component for the movement of the Pawn.
 */
 #pragma once
 

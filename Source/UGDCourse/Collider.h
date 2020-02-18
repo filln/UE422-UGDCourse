@@ -1,5 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+/*Custom Pawn. It is able to move by pressing the keys and has a controlled camera.*/
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -32,6 +34,7 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 		USpringArmComponent* SpringArm;
 
+	/*Custom Movement Component for move by pressing keys.*/
 	UPROPERTY(VisibleAnywhere, Category = "Movement")
 		UColliderMovementComponent* OurMovementComponent;
 
@@ -64,12 +67,14 @@ public:
 
 private:
 
+	/*Moving.*/
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
+	/*Camera control.*/
 	void CameraPitch(float AxisValue);
 	void CameraYaw(float AxisValue);
 
-	/*Для сохранения временного положения камеры.*/
+	/*To maintain the temporary position of the camera. */
 	FVector2D CameraInput;
 };

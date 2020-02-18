@@ -1,5 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+/*It's a three-point system floating in its amplitude. Or rather, its visual representation.*/
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -22,47 +24,50 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ActorMeshComponents")
 		UStaticMeshComponent* StaticMesh;
 
-	/*Начальная локация при вызове BeginPlay().*/
+	/*The initial random position of the Floater is set in BeginPlay().*/
 	UPROPERTY(EditInstanceOnly, Category = "FloaterVectors")
 		FVector InitialLocation;
 
-	/*Сохраненная локация при установке из редактора.*/
+	/*Floater position at the beginning of the game. Defines the installation of the Floater in the editor.*/
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "FloaterVectors")
 		FVector PlacedLocation;
 
-	/**/
+	/*Not use.*/
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "FloaterVectors")
 		FVector WorldOrigin;
 
-	/*Вектор движения для AddActorLocalOffset().*/
+	/*Not use.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FloaterVectors")
 		FVector InitialDirection;
 
-	/**/
+	/*Not use.*/
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "FloaterVectors")
 		FVector InitialForce;
 
-	/**/
+	/*Not use.*/
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "FloaterVectors")
 		FVector InitialTorque;
 
-	/*Двигаться ли?*/
+	/*Moving on Tick()*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FloaterVariables")
 		bool bShouldFloat;
 
-	/*Перемещать ли на локацию InitialLocation в начале игры?*/
+	/*Move to InitialLocation at the beginning of the game.*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "FloaterVariables")
 		bool bInitializeFloaterLocations;
 
-	/*Параметры колебаний*/
+	/*Oscillation amplitude.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloaterVariables | Wave parameters")
 	float Amplitude;
+
+	/*Multiplicator for oscillation parameters.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloaterVariables | Wave parameters")
 	float TimeStretch;
 
 
 private:
 
+	/*Oscillation time for sin() and cos(). Depends on DeltaTime in Tick().*/
 	float RunningTime;
 
 protected:

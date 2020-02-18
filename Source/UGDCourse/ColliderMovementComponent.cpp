@@ -17,19 +17,19 @@ void UColliderMovementComponent::TickComponent(float DeltaTime, enum ELevelTick 
 		return;
 	}
 
-	/*Запомнить вектор движения и очистить вектор-источник. 
-	GetClampedToMaxSize(1.f) позволяет двигаться с одинаковой скоростью по прямой и диагональной траектории. 
-	DeltaTime сглаживает разницу в скорости при разном ФПС.
+	/*Remember the motion vector and clear the source vector.
+	GetClampedToMaxSize(1.f) allows you to move with the same speed on a straight and diagonal trajectory.
+	DeltaTime smoothes the difference in speed at different FPS.
 	*/
 	FVector DesiredMovementThisFrame = ConsumeInputVector().GetClampedToMaxSize(1.f) * DeltaTime * 150.f;
 
-	/*Если вектор не близок к нулю, то двигаться.*/
+	/*If the vector is not close to zero, then move.*/
 	if (!DesiredMovementThisFrame.IsNearlyZero())
 	{
 		FHitResult Hit;
 		SafeMoveUpdatedComponent(DesiredMovementThisFrame, UpdatedComponent->GetComponentRotation(), true, Hit);
 
-		/*Если сталкиваемся с поверхностью, то скользить по ней.*/
+		/*If we run into a surface, slide on it.*/
 		if (Hit.IsValidBlockingHit())
 		{
 			SlideAlongSurface(DesiredMovementThisFrame, 1.f - Hit.Time, Hit.Normal, Hit);

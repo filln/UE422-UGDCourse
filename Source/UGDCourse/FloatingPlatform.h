@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+/*A platform that moves independently from one point to another. Designed to move the character.*/
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -23,23 +25,31 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FloatingPlatform")
 		UStaticMeshComponent* Mesh;
 
+	/*First point of motion.*/
 	UPROPERTY(EditAnywhere, Category = "FloatingPlatform")
 		FVector StartPoint;
 
+	/*Second point of motion. In Local space.*/
 	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = "true"), Category = "FloatingPlatform")
 		FVector EndPoint;
 
 	/*Speed of platform.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FloatingPlatform")
 		float InterpSpeed;
+
 	/*Pause between movings.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FloatingPlatform")
 		float InterpTime;
 
 private:
 
+	/*Timer for pause between movings.*/
 	FTimerHandle InterpTimer;
+
+	/*If true than move. If false than stay.*/
 	bool bInterping;
+
+	/*Distance between StartPoint and EndPoint.*/
 	float Distance;
 
 protected:
@@ -50,7 +60,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	/*Switch bInterping.*/
 	void ToggleInterping();
+
+	/*Swap StartPoint and EndPoint for change of direction.*/
 	void SwapVectors(FVector& VecOne, FVector& VecTwo);
 
 };

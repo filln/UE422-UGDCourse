@@ -8,11 +8,12 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Sound/SoundCue.h"
+#include "MainCharacter.h"
 
 // Sets default values
 AItem::AItem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CollisionVolume = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionVolume"));
@@ -32,16 +33,21 @@ void AItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 {
 	UE_LOG(LogTemp, Warning, TEXT("Super::OverlapBegin."));
 
-	if (OverlapParticles != nullptr)
+	/*Do some effects.*/
+	AMainCharacter* MainCharacter = Cast<AMainCharacter>(OtherActor);
+	if (MainCharacter)
 	{
-		OverlapParticlesTransform.SetLocation(GetActorLocation());
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OverlapParticles, OverlapParticlesTransform);
+		if (OverlapParticles != nullptr)
+		{
+			OverlapParticlesTransform.SetLocation(GetActorLocation());
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OverlapParticles, OverlapParticlesTransform);
+		}
+		if (OverlapSound != nullptr)
+		{
+			UGameplayStatics::PlaySound2D(this, OverlapSound);
+		}
 	}
-	if (OverlapSound != nullptr)
-	{
-		UGameplayStatics::PlaySound2D(this, OverlapSound);
-	}
-	Destroy();
+
 }
 
 void AItem::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -55,7 +61,7 @@ void AItem::BeginPlay()
 	Super::BeginPlay();
 
 	CollisionVolume->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnOverlapBegin);
-	CollisionVolume->OnComponentEndOverlap.AddDynamic(this, &AItem::OnOverlapEnd);	
+	CollisionVolume->OnComponentEndOverlap.AddDynamic(this, &AItem::OnOverlapEnd);
 }
 
 // Called every frame
@@ -63,6 +69,7 @@ void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*Rotation.*/
 	if (bRotate)
 	{
 		FRotator ItemRotation = GetActorRotation();

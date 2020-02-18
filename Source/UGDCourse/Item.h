@@ -1,5 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+/*Abstract class for item that overlapped by MainCharacter and does some visual and sound effects. Item rotates around its axe.*/
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -42,14 +44,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Sound")
 		USoundCue* OverlapSound;
 
+	/*Rotates or not in Tick().*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Properties")
 		bool bRotate;
 
+	/*Speed of rotation.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Properties")
 		float RotationRate;
 
 public:
 
+	/*Overlapped by MainCharacter.*/
 	UFUNCTION()
 		virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 

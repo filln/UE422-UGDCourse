@@ -36,9 +36,13 @@ void AFloorSwitch::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	UE_LOG(LogTemp, Warning, TEXT("Overlap Begin."));
 
+	/*Stop timer that close the door.*/
 	GetWorldTimerManager().ClearTimer(SwitchHandle);
 
+	/*Open the door.*/
 	RaiseDoor();
+
+	/*Lower the platform.*/
 	LowerFloor();
 }
 
@@ -46,6 +50,7 @@ void AFloorSwitch::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor
 {
 	UE_LOG(LogTemp, Warning, TEXT("Overlap End."));
 
+	/*Start timer that close the door.*/
 	GetWorldTimerManager().SetTimer(SwitchHandle, this, &AFloorSwitch::CloseDoor, SwitchTime);
 
 }

@@ -1,5 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+/*Switch to open the door. When the character becomes on the switch, the switch moves down under the load of the character.
+Then the switch signal opens the door.
+*/
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -51,33 +55,41 @@ private:
 
 public:
 
-
+	/*Overlap with MainCharacter so that open the door.*/
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	/*Overlap with MainCharacter so that close the door.*/
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	/*Open the door.*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "FloorSwitch")
 		void RaiseDoor();
 
+	/*Close the door.*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "FloorSwitch")
 		void LowerDoor();
 
+	/*Raise the platform from which the character left.*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "FloorSwitch")
 		void RiseFloor();
 
+	/*Lower the platform the character walked into.*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "FloorSwitch")
 		void LowerFloor();
 
+	/*Update location in timeline. Turn the door up or down.*/
 	UFUNCTION(BlueprintCallable, Category = "FloorSwitch")
 		void UpdateDoorLocation(float Z);
 
+	/*Update location in timeline. Turn the floor up or down.*/
 	UFUNCTION(BlueprintCallable, Category = "FloorSwitch")
 		void UpdateFloorLocation(float Z);
 
 private:
 
+	/*Some of the events associated with closing the door.*/
 	void CloseDoor();
 
 protected:

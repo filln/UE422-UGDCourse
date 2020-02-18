@@ -39,10 +39,10 @@ ACollider::ACollider()
 
 	CameraInput = FVector2D(0.f, 0.f);
 
-	/*Найти ассет меша.*/
+	/*Find the mesh asset.*/
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("StaticMesh'/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere'"));
 
-	/*Если найден, то определить меш.*/
+	/*If found, identify the mesh.*/
 	if (MeshAsset.Succeeded())
 	{
 		Mesh->SetStaticMesh(MeshAsset.Object);
@@ -66,10 +66,12 @@ void ACollider::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*Pawn rotation depending on the mouse moving.*/
 	FRotator NewRotation = GetActorRotation();
 	NewRotation.Yaw += CameraInput.X;
 	SetActorRotation(NewRotation);
 
+	/*Camera and SpringArm rotation depending on the mouse moving.*/
 	FRotator NewSpringArmRotation = SpringArm->GetComponentRotation();
 	NewSpringArmRotation.Pitch = FMath::Clamp(NewSpringArmRotation.Pitch += CameraInput.Y, -80.f, -15.f);
 	SpringArm->SetWorldRotation(NewSpringArmRotation);

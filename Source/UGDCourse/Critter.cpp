@@ -40,6 +40,7 @@ void ACritter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*Move Critter, if CurrentVelocity != 0.*/
 	FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
 	SetActorLocation(NewLocation);
 
@@ -57,11 +58,13 @@ void ACritter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void ACritter::MoveForward(float Value)
 {
+	/*Calculate velocity.*/
 	CurrentVelocity.X = FMath::Clamp(Value, -1.f, 1.f) * MaxSpeed;
 }
 
 void ACritter::MoveRight(float Value)
 {
+	/*Calculate velocity.*/
 	CurrentVelocity.Y = FMath::Clamp(Value, -1.f, 1.f) * MaxSpeed;
 }
 

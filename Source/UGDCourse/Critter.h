@@ -1,5 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+/*Simple Pawn. Knows how to move at the touch of a key. Movement is implemented without Movement Component. Also can be controlled by AI.*/
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -26,11 +28,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Camera")
 		UCameraComponent* Camera;
 
+	/*Maximal movement speed.*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Movement")
 		float MaxSpeed;
 
 private:
 
+	/*To save the movement speed calculated in MoveForward, MoveRight.*/
 	FVector CurrentVelocity;
 
 

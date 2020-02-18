@@ -27,6 +27,8 @@ void AFloatingPlatform::BeginPlay()
 	Super::BeginPlay();
 
 	StartPoint = GetActorLocation();
+
+	/*Get EndPoint in World Space.*/
 	EndPoint += StartPoint;
 
 	/*Delay in launching the platform.*/
@@ -42,20 +44,25 @@ void AFloatingPlatform::Tick(float DeltaTime)
 
 	if (bInterping)
 	{
+		/*Move platform every Tick to point Interp.*/
 		FVector CurrentLocation = GetActorLocation();
 		FVector Interp = FMath::VInterpTo(CurrentLocation, EndPoint, DeltaTime, InterpSpeed);
 		SetActorLocation(Interp);
 	}
 
+	/*Get distance between current location and StartPoint.*/
 	float DistanceTraveled = (GetActorLocation() - StartPoint).Size();
 
 	/*If platform come to EndPoint.*/
 	if (Distance - DistanceTraveled <= 0.1f)
 	{
+		/*Stop moving.*/
 		ToggleInterping();
+
 		/*Delay in launching the platform.*/
 		GetWorldTimerManager().SetTimer(InterpTimer, this, &AFloatingPlatform::ToggleInterping, InterpTime);
 
+		/*Swap start and end points.*/
 		SwapVectors(StartPoint, EndPoint);
 	}
 
