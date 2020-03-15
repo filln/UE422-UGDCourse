@@ -116,6 +116,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 		float DeathDelay;
 
+
 public:
 
 	/*For frequency of attack.*/
@@ -123,6 +124,9 @@ public:
 
 	/*For delay before Destroy().*/
 	FTimerHandle DeathTimer;
+
+	/*True if MainCharacter is alive or reference on MainCharacter is valid.*/
+	bool bHasValidTarget;
 
 
 public:
@@ -194,10 +198,10 @@ public:
 	) override;
 
 	/*Decrease Health when take damage.*/
-	void DecrementHealth(float Amount);
+	void DecrementHealth(float Amount, AActor* DamageCauser);
 
 	/*Die when Health == 0.*/
-	void Die();
+	void Die(AActor* Causer);
 
 	/*Checking the enemy is not dead.*/
 	bool Alive();

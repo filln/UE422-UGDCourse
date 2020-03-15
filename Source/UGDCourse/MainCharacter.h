@@ -24,6 +24,7 @@ enum class EMovementStatus : uint8
 {
 	EMS_Normal		 UMETA(DisplayName = "Normal"),    //Normal speed (normal animation).
 	EMS_Sprinting	 UMETA(DisplayName = "Sprinting"), //High speed (high-speed animation).
+	EMS_Dead		 UMETA(DisplayName = "Dead")		//Not movable.
 };
 
 /*Status of stamina (resource for sprinting).*/
@@ -143,6 +144,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 		FVector CombatTargetLocation;
 
+	/*Reference to class of Enemy for UpdateCombatTarget().*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		TSubclassOf<AEnemy> EnemyFilter;
+
 public:
 
 	/*True if Shift pressed. Use for management of stamina.*/
@@ -156,6 +161,12 @@ public:
 
 	/*If true than rotate to enemy after attack him.*/
 	bool bInterpToEnemy;
+
+	/*True if character moves.*/
+	bool bMovingForward;
+
+	/*True if character moves.*/
+	bool bMovinRight;
 
 	/*Set bInterpToEnemy.*/
 	void SetInterpToEnemy(bool NewbInterpToEnemy);
@@ -246,8 +257,14 @@ public:
 	/*Play attack animation.*/
 	void Attack();
 
+	/*Jumping.*/
+	virtual void Jump() override;
+
 	/*Return rotator to Target. Use for rotate to Enemy after attack him.*/
 	FRotator GetLookAtRotationYaw(FVector Target);
+
+	/*Set new closest in distance CombatTarget. Display Enemy HealthBar.*/
+	void UpdateCombatTarget();
 
 	/*Set new reference to Enemy.*/
 	FORCEINLINE void SetCombatTarget(AEnemy* NewCombatTarget) { CombatTarget = NewCombatTarget; }

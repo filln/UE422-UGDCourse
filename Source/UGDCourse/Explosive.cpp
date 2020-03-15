@@ -3,6 +3,10 @@
 
 #include "Explosive.h"
 #include "MainCharacter.h"
+#include "Enemy.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
+#include "Sound/SoundCue.h"
 
 AExplosive::AExplosive()
 {
@@ -18,11 +22,23 @@ void AExplosive::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 	if (OtherActor)
 	{
 		AMainCharacter* MainCharacter = Cast<AMainCharacter>(OtherActor);
+		AEnemy* Enemy = Cast<AEnemy>(OtherActor);
 
-		if (MainCharacter)
+		if (MainCharacter || Enemy)
 		{
-			/*Damage to MainCharacter.*/
-			MainCharacter->DecrementHealth(Damage);
+			/*Do some effects.*/
+			if (OverlapParticles != nullptr)
+			{
+				OverlapParticlesTransform.SetLocation(GetActorLocation());
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OverlapParticles, OverlapParticlesTransform);
+			}
+			if (OverlapSound != nullptr)
+			{
+				UGameplayStatics::PlaySound2D(this, OverlapSound);
+			}
+
+			/*Damage to Actor.*/
+			UGameplayStatics::ApplyDamage(OtherActor, Damage, nullptr, this, DamageTypeClass);
 
 			/*Destroy this item.*/
 			Destroy();

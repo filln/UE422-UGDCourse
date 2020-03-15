@@ -50,6 +50,8 @@ AEnemy::AEnemy()
     SetMovementStatus(EEnemyMovementStatus::EMS_Idle);
 
     DeathDelay = 3.0f;
+
+    bHasValidTarget = false;
 }
 
 // Called when the game starts or when spawned
@@ -67,6 +69,9 @@ void AEnemy::BeginPlay()
 
     CombatCollisionDoDamage->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::CombatCollisionDoDamageOnOverlapBegin);
     CombatCollisionDoDamage->OnComponentEndOverlap.AddDynamic(this, &AEnemy::CombatCollisionDoDamageOnOverlapEnd);
+
+    GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 }
 
@@ -106,13 +111,11 @@ void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AA
 
             /*Hide Enemy Healthbar.*/
             MainCharacter->SetHasCombatTarget(false);
-            if (MainCharacter->MainPlayerController)
-            {
-                MainCharacter->MainPlayerController->RemoveEnemyHealthBar();
-            }
+            MainCharacter->UpdateCombatTarget();
 
             /*Unset CombatTarget at Enemy.*/
             CombatTarget = nullptr;
+            bHasValidTarget = false;
         }
     }
 }
@@ -125,15 +128,13 @@ void AEnemy::CombatSphereTakeDamageOnOverlapBegin(UPrimitiveComponent* Overlappe
         AMainCharacter* MainCharacter = Cast<AMainCharacter>(OtherActor);
         if (MainCharacter)
         {
+            bHasValidTarget = true;
             /*Set CombatTarget at MainCharacter*/
             MainCharacter->SetCombatTarget(this);
             MainCharacter->SetHasCombatTarget(true);
 
-            /*Show Enemy Healthbar.*/
-            if (MainCharacter->MainPlayerController)
-            {
-                MainCharacter->MainPlayerController->DisplayEnemyHealthBar();
-            }
+            /*Set new closest Enemy, display health bar.*/
+            MainCharacter->UpdateCombatTarget();
 
             /*Set CombatTarget at Enemy.*/
             CombatTarget = MainCharacter;
@@ -148,22 +149,31 @@ void AEnemy::CombatSphereTakeDamageOnOverlapBegin(UPrimitiveComponent* Overlappe
 void AEnemy::CombatSphereTakeDamageOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
     /*if overlapped Actor is valid and Enemy is not dead.*/
-    if (OtherActor && Alive())
+    if (OtherActor && Alive() && OtherComp)
     {
         AMainCharacter* MainCharacter = Cast<AMainCharacter>(OtherActor);
         if (MainCharacter)
         {
             bOverlappingCombatSphere = false;
-
-            /*This code will not work under current conditions,
-            because CombatSphereTakeDamageOnOverlapBegin will always have Attack() and EnemyMovementStatus == EEnemyMovementStatus::EMS_Attacking
-            */
-            if (EnemyMovementStatus != EEnemyMovementStatus::EMS_Attacking)
+            MoveToTarget(MainCharacter);
+            CombatTarget = nullptr;
+            if (MainCharacter->CombatTarget == this)
             {
-                MoveToTarget(MainCharacter);
-                GetWorldTimerManager().ClearTimer(AttackTimer);
-                CombatTarget = nullptr;
+                MainCharacter->SetCombatTarget(nullptr);
+                MainCharacter->bHasCombatTarget = false;
+                MainCharacter->UpdateCombatTarget();
             }
+
+            if (MainCharacter->MainPlayerController)
+            {
+                USkeletalMeshComponent* MainCharacterMesh = Cast<USkeletalMeshComponent>(OtherComp);
+                if (MainCharacterMesh)
+                {
+                    MainCharacter->MainPlayerController->RemoveEnemyHealthBar();
+                }
+            }
+
+            GetWorldTimerManager().ClearTimer(AttackTimer);
         }
     }
 }
@@ -272,7 +282,7 @@ void AEnemy::Attack()
         return;
     }
     
-    if (AIController == nullptr)
+    if (AIController == nullptr || !bHasValidTarget)
     {
         return;
     }
@@ -301,11 +311,11 @@ void AEnemy::Attack()
 float AEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
     /*Reduce Enemy Health.*/
-    DecrementHealth(DamageAmount);
+    DecrementHealth(DamageAmount, DamageCauser);
     return DamageAmount;
 }
 
-void AEnemy::DecrementHealth(float Amount)
+void AEnemy::DecrementHealth(float Amount, AActor* DamageCauser)
 {
     /*Limit Health to a value equal or above zero.*/
     Health = FMath::Clamp(Health - Amount, (float)0, MaxHealth);
@@ -313,11 +323,11 @@ void AEnemy::DecrementHealth(float Amount)
     /*If Health equal zero than die.*/
     if (Health == 0)
     {
-        Die();
+        Die(DamageCauser);
     }
 }
 
-void AEnemy::Die()
+void AEnemy::Die(AActor* Causer)
 {
     SetMovementStatus(EEnemyMovementStatus::EMS_Dead);
 
@@ -335,6 +345,12 @@ void AEnemy::Die()
     CombatSphereTakeDamage->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     DamageSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     CombatCollisionDoDamage->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    AMainCharacter* MainCharacter = Cast<AMainCharacter>(Causer);
+    if (MainCharacter)
+    {
+        MainCharacter->UpdateCombatTarget(); 
+    }
 }
 
 bool AEnemy::Alive()

@@ -74,6 +74,9 @@ AMainCharacter::AMainCharacter()
 	bInterpToEnemy = false;
 
 	bHasCombatTarget = false;
+
+	bMovingForward = false;
+	bMovinRight = false;
 }
 
 
@@ -107,6 +110,11 @@ void AMainCharacter::SetMovementStatus(EMovementStatus NewStatus)
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (MovementStatus == EMovementStatus::EMS_Dead)
+	{
+		return;
+	}
 
 	/*Use stamina and sprint.*/
 	StaminaManagement(DeltaTime);
@@ -145,8 +153,17 @@ void AMainCharacter::StaminaManagement(float DeltaTime)
 			{
 				SetStaminaStatus(EStaminaStatus::ESS_BelowMinimum);
 			}
-			/*Set status to sprinting.*/
-			SetMovementStatus(EMovementStatus::EMS_Sprinting);
+			/*Set status to sprinting if character moves.*/
+			if (bMovingForward || bMovinRight)
+			{
+				SetMovementStatus(EMovementStatus::EMS_Sprinting);
+			}
+			else
+			{
+				/*Set status to Normal.*/
+				SetMovementStatus(EMovementStatus::EMS_Normal);
+			}
+
 		}
 		/*If shift key up.*/
 		else
@@ -224,7 +241,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	check(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMainCharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMainCharacter::ShiftKeyDown);
@@ -246,7 +263,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void AMainCharacter::MoveForward(float Value)
 {
 	/*Not move.*/
-	if (Controller == nullptr || Value == 0 || bAttacking)
+	bMovingForward = false;
+	if (Controller == nullptr || Value == 0 || bAttacking || MovementStatus == EMovementStatus::EMS_Dead)
 	{
 		return;
 	}
@@ -258,12 +276,15 @@ void AMainCharacter::MoveForward(float Value)
 
 	/*Move to Direction in X axe.*/
 	AddMovementInput(Direction, Value);
+
+	bMovingForward = true;
 }
 
 void AMainCharacter::MoveRight(float Value)
 {
 	/*Not move.*/
-	if (Controller == nullptr || Value == 0 || bAttacking)
+	bMovinRight = false;
+	if (Controller == nullptr || Value == 0 || bAttacking || MovementStatus == EMovementStatus::EMS_Dead)
 	{
 		return;
 	}
@@ -275,6 +296,8 @@ void AMainCharacter::MoveRight(float Value)
 
 	/*Move to Direction in Y axe.*/
 	AddMovementInput(Direction, Value);
+
+	bMovinRight = true;
 }
 
 void AMainCharacter::TurnAtRate(float Rate)
@@ -300,7 +323,24 @@ void AMainCharacter::DecrementHealth(float Amount)
 
 float AMainCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser)
 {
-	DecrementHealth(DamageAmount);
+	/*Limit Health from zero to maximum.*/
+	Health = FMath::Clamp(Health - DamageAmount, (float)0, MaxHealth);
+
+	if (Health == 0)
+	{
+		Die();
+
+		/*Say Enemy that MainCharacter dead.*/
+		if (DamageCauser)
+		{
+			AEnemy* Enemy = Cast<AEnemy>(DamageCauser);
+			if (Enemy)
+			{
+				Enemy->bHasValidTarget = false;
+			}
+		}
+	}
+
 	return DamageAmount;
 }
 
@@ -313,6 +353,7 @@ void AMainCharacter::Die()
 		AnimInst->Montage_Play(CombatMontage, 1.0f);
 		AnimInst->Montage_JumpToSection(FName("Death"), CombatMontage);
 	}
+	SetMovementStatus(EMovementStatus::EMS_Dead);
 }
 
 void AMainCharacter::IncrementCoins(int32 Amount)
@@ -333,6 +374,11 @@ void AMainCharacter::ShiftKeyUp()
 void AMainCharacter::LMBDown()
 {
 	bLMBDown = true;
+
+	if (MovementStatus == EMovementStatus::EMS_Dead)
+	{
+		return;
+	}
 
 	/*If character ovelappings some weapon than equips it. Else it attacks.*/
 
@@ -373,8 +419,8 @@ void AMainCharacter::SetEquippedWeapon(AWeapon* NewWeapon)
 
 void AMainCharacter::Attack()
 {
-	/*Do nothing if character attack now.*/
-	if (bAttacking)
+	/*Do nothing if character attack now or dead.*/
+	if (bAttacking && (MovementStatus == EMovementStatus::EMS_Dead))
 	{
 		return;
 	}
@@ -407,11 +453,62 @@ void AMainCharacter::Attack()
 	}
 }
 
+void AMainCharacter::Jump()
+{
+	if (MovementStatus == EMovementStatus::EMS_Dead)
+	{
+		return;
+	}
+
+	Super::Jump();
+}
+
 FRotator AMainCharacter::GetLookAtRotationYaw(FVector Target)
 {
 	FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Target);
 	FRotator LookAtRotationYaw(0.f, LookAtRotation.Yaw, 0.f);
 	return LookAtRotationYaw;
+}
+
+void AMainCharacter::UpdateCombatTarget()
+{
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors, EnemyFilter);
+	if (OverlappingActors.Num() == 0)
+	{
+		if (MainPlayerController)
+		{
+			MainPlayerController->RemoveEnemyHealthBar();
+		}
+		return;
+	}
+	AEnemy* ClosestEnemy = Cast<AEnemy>(OverlappingActors[0]);
+	if (ClosestEnemy)
+	{
+		FVector Location = GetActorLocation();
+		float MinDistance = (ClosestEnemy->GetActorLocation() - Location).Size();
+
+		for (auto Actor : OverlappingActors)
+		{
+			AEnemy* Enemy = Cast<AEnemy>(Actor);
+			if (Enemy)
+			{
+				float DistanceToActor = (Enemy->GetActorLocation() - Location).Size();
+				if (DistanceToActor < MinDistance)
+				{
+					MinDistance = DistanceToActor;
+					ClosestEnemy = Enemy;
+				}
+			}
+		}
+
+		if (MainPlayerController)
+		{
+			MainPlayerController->DisplayEnemyHealthBar();
+		}
+		SetCombatTarget(ClosestEnemy);
+		bHasCombatTarget = true;
+	}
 }
 
 void AMainCharacter::DeathEnd()

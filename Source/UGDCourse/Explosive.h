@@ -11,6 +11,9 @@
 /**
  *
  */
+
+class UDamageType;
+
 UCLASS()
 class UGDCOURSE_API AExplosive : public AItem
 {
@@ -22,9 +25,13 @@ public:
 
 public:
 
-	/*Damage to MainCharacter.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Damage")
+	/*Damage to Actor.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 		float Damage;
+
+	/*Use for method UGameplayStatics::ApplyDamage().*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+		TSubclassOf<UDamageType> DamageTypeClass;
 
 public:
 
