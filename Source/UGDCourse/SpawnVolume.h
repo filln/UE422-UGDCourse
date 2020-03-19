@@ -28,7 +28,22 @@ public:
 
 	/*Class for spawn.*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnVolume")
-		TSubclassOf<ACritter> PawnToSpawn;
+		TSubclassOf<AActor> Actor_1;
+	/*Class for spawn.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnVolume")
+		TSubclassOf<AActor> Actor_2;
+	/*Class for spawn.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnVolume")
+		TSubclassOf<AActor> Actor_3;
+	/*Class for spawn.*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SpawnVolume")
+		TSubclassOf<AActor> Actor_4;
+
+
+public:
+
+	/*Array of classes for spawn.*/
+	TArray<TSubclassOf<AActor>> SpawnArray;
 
 public:
 
@@ -38,7 +53,11 @@ public:
 
 	/*Blueprint event for spawn our ToSpawn class.*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "SpawnVolume")
-		void SpawnOurPawn(UClass* ToSpawn, const FTransform& TransformOfSpawn);
+		void SpawnOurActor(UClass* ToSpawn, const FTransform& TransformOfSpawn);
+
+	/*Return random class from SpawnArray.*/
+	UFUNCTION(BlueprintPure, Category = "SpawnVolume")
+		TSubclassOf<AActor> GetSpawnActor();
 
 protected:
 	// Called when the game starts or when spawned

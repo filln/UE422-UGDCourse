@@ -361,6 +361,18 @@ void AMainCharacter::IncrementCoins(int32 Amount)
 	Coins += Amount;
 }
 
+void AMainCharacter::IncrementHealth(float Amount)
+{
+	if (Health + Amount >= MaxHealth)
+	{
+		Health = MaxHealth;
+	}
+	else
+	{
+		Health += Amount;
+	}
+}
+
 void AMainCharacter::ShiftKeyDown()
 {
 	bShiftKeyDown = true;

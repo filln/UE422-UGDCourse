@@ -11,6 +11,9 @@
 /**
  *
  */
+
+class AMainCharacter;
+
 UCLASS()
 class UGDCOURSE_API APickup : public AItem
 {
@@ -21,9 +24,8 @@ public:
 
 public:
 
-	/*Count of the coins.*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Coins")
-		int32 CoinCount;
+	UFUNCTION(BlueprintImplementableEvent, Category = "Pickup")
+		void OnPickUp_BP(AMainCharacter* Target);
 
 public:
 

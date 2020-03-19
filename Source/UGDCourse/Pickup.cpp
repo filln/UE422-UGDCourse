@@ -10,22 +10,24 @@
 
 APickup::APickup()
 {
-	CoinCount = 1;
+
 }
 
 void APickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-	UE_LOG(LogTemp, Warning, TEXT("Pickup::OverlapBegin."));
 
-	/*Increment count of the coins in MainCharacter and destroy this coin.*/
+	/*Do some effects and destoy.*/
 	if (OtherActor)
 	{
 		AMainCharacter* MainCharacter = Cast<AMainCharacter>(OtherActor);
 
 		if (MainCharacter)
 		{
+
+			OnPickUp_BP(MainCharacter);
+
 			/*Do some effects.*/
 			if (OverlapParticles != nullptr)
 			{
@@ -37,7 +39,6 @@ void APickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 				UGameplayStatics::PlaySound2D(this, OverlapSound);
 			}
 
-			MainCharacter->IncrementCoins(CoinCount);
 			Destroy();
 		}
 	}
@@ -47,5 +48,4 @@ void APickup::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 {
 	Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 
-	UE_LOG(LogTemp, Warning, TEXT("Pickup::OverlapEnd."));
 }

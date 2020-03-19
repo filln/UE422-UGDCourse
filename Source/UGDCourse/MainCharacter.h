@@ -186,6 +186,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void DeathEnd();
 
+	/*Increase coins.*/
+	UFUNCTION(BlueprintCallable)
+		void IncrementCoins(int32 Amount);
+
+	/*Healing.*/
+	UFUNCTION(BlueprintCallable)
+		void IncrementHealth(float Amount);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -235,9 +243,6 @@ public:
 
 	/*Die when Health == 0.*/
 	void Die();
-
-	/*Increase coins.*/
-	void IncrementCoins(int32 Amount);
 
 	/*Pressed down to enable sprinting.*/
 	void ShiftKeyDown();
