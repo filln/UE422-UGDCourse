@@ -17,7 +17,7 @@ void AExplosive::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 {
 	Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-	UE_LOG(LogTemp, Warning, TEXT("Explosive::OverlapBegin."));
+	//UE_LOG(LogTemp, Warning, TEXT("Explosive::OverlapBegin."));
 
 	if (OtherActor)
 	{
@@ -50,5 +50,5 @@ void AExplosive::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 
-	UE_LOG(LogTemp, Warning, TEXT("Explosive::OverlapEnd."));
+	//UE_LOG(LogTemp, Warning, TEXT("Explosive::OverlapEnd."));
 }

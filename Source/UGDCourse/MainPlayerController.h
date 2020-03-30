@@ -56,20 +56,44 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
 		UUserWidget* EnemyHealthBar;
 
+	/*Class of the Pause menu widget.*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		TSubclassOf<UUserWidget> WPauseMenu;
+
+	/*Object of the Pause menu widget.*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
+		UUserWidget* PauseMenu;
+
 
 public:
 	/*Do not specify the position of the health widget in Tick().*/
 	bool bEnemyHealthBarVisible;
+	/*Do not specify the position of the Pause menu in Tick().*/
+	bool bIsPauseMenuVisible;
 
 	/*For position of the health widget.*/
 	FVector EnemyLocation;
 
+public:
+
+	/*Show or hide widget.*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Widgets")
+	void DisplayPauseMenu();
+
+	/*Show or hide widget.*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Widgets")
+	void RemovePauseMenu();
 
 public:
 
 	/*Show or hide widget.*/
 	void DisplayEnemyHealthBar();
 	void RemoveEnemyHealthBar();
+
+	void TogglePauseMenu();
+
+	/*Set input mode GameOnly.*/
+	void GameModeOnly();
 
 protected:
 

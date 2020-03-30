@@ -25,14 +25,19 @@ void ASpawnVolume::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (Actor_1 && Actor_2 && Actor_3 && Actor_4)
-	{
-		SpawnArray.Add(Actor_1);
-		SpawnArray.Add(Actor_2);
-		SpawnArray.Add(Actor_3);
-		SpawnArray.Add(Actor_4);
-	}
-	
+	if (Actor_1) SpawnArray.Add(Actor_1);
+	if (Actor_2) SpawnArray.Add(Actor_2);
+	if (Actor_3) SpawnArray.Add(Actor_3);
+	if (Actor_4) SpawnArray.Add(Actor_4);
+
+	//if (Actor_1 && Actor_2 && Actor_3 && Actor_4)
+	//{
+	//	SpawnArray.Add(Actor_1);
+	//	SpawnArray.Add(Actor_2);
+	//	SpawnArray.Add(Actor_3);
+	//	SpawnArray.Add(Actor_4);
+	//}
+
 }
 
 FVector ASpawnVolume::GetSpawnPoint()

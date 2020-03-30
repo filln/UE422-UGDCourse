@@ -74,6 +74,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 		AController* WeaponInstigator;
 
+	UPROPERTY(EditDefaultsOnly, Category = "SaveData")
+		FString WeaponName;
 
 
 public:

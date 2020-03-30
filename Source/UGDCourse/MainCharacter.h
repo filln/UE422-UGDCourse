@@ -17,6 +17,7 @@ class USoundCue;
 class UParticleSystem;
 class AEnemy;
 class AMainPlayerController;
+class AItemStorage;
 
 /*Status of character movement.*/
 UENUM(BlueprintType)
@@ -148,6 +149,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 		TSubclassOf<AEnemy> EnemyFilter;
 
+	/*Reference to class for save data.*/
+	UPROPERTY(EditDefaultsOnly, Category = "SaveData")
+		TSubclassOf<AItemStorage> WeaponStorage;
+
 public:
 
 	/*True if Shift pressed. Use for management of stamina.*/
@@ -155,6 +160,9 @@ public:
 
 	/*True if Left Mouse Button pressed. Use for a repeat attack.*/
 	bool bLMBDown;
+
+	/*True if Esc Button pressed. Use for a Pause menu.*/
+	bool bEscDown;
 
 	/*Speed of rotate to enemy after attack him.*/
 	float InterpSpeed;
@@ -194,6 +202,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void IncrementHealth(float Amount);
 
+	UFUNCTION(BlueprintCallable)
+		void SaveGame();
+
+	UFUNCTION(BlueprintCallable)
+		void LoadGame();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -213,6 +227,12 @@ public:
 
 	/*Called for side to side input.*/
 	void MoveRight(float Value);
+
+	/*Called for Yaw rotation.*/
+	void Turn(float Value);
+
+	/*Called for Pitch rotation.*/
+	void LookUp(float Value);
 
 	/**Called via input to turn at a given input.
 	* @param Rate This is a normalized rate, i.e. 1.0 means 100% of desired turn rate.
@@ -256,6 +276,12 @@ public:
 	/*Call when the Left Mouse Button was released.*/
 	void LMBUp();
 
+	/*Call when the Esc Button was pressed.*/
+	void EscDown();
+
+	/*Call when the Esc Button was released.*/
+	void EscUp();
+
 	/*Change weapon or first set it.*/
 	void SetEquippedWeapon(AWeapon* NewWeapon);
 
@@ -270,6 +296,15 @@ public:
 
 	/*Set new closest in distance CombatTarget. Display Enemy HealthBar.*/
 	void UpdateCombatTarget();
+
+	/*Switch to level by name.*/
+	void SwitchLevel(FName LevelName);
+
+	/*Check variables for movement.*/
+	bool CanMove(float Value);
+
+	/*Load Game without switch location for BeginPlay().*/
+	void LoadGameNoSwitch();
 
 	/*Set new reference to Enemy.*/
 	FORCEINLINE void SetCombatTarget(AEnemy* NewCombatTarget) { CombatTarget = NewCombatTarget; }
