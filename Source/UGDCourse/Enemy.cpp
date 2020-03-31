@@ -35,6 +35,7 @@ AEnemy::AEnemy()
 
 	CombatCollisionDoDamage = CreateDefaultSubobject<UBoxComponent>(TEXT("DamageCollision"));
 	CombatCollisionDoDamage->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("EnemySocket"));
+	CombatCollisionDoDamage->SetupAttachment(GetMesh(), FName("EnemySocket"));
 
 	bOverlappingCombatSphere = false;
 
@@ -72,6 +73,8 @@ void AEnemy::BeginPlay()
 
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+
+	CombatCollisionDoDamage->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("EnemySocket"));
 
 }
 
