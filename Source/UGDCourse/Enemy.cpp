@@ -34,7 +34,6 @@ AEnemy::AEnemy()
 	DamageSphere->InitSphereRadius(55.f);
 
 	CombatCollisionDoDamage = CreateDefaultSubobject<UBoxComponent>(TEXT("DamageCollision"));
-	CombatCollisionDoDamage->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("EnemySocket"));
 	CombatCollisionDoDamage->SetupAttachment(GetMesh(), FName("EnemySocket"));
 
 	bOverlappingCombatSphere = false;
